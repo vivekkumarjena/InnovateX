@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./QuizBot.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
 const QuizBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -10,25 +12,18 @@ const QuizBot = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [quizOver, setQuizOver] = useState(false);
 
-  // Fetch quiz questions from backend
   useEffect(() => {
-    axios.get("http://localhost:5001/questions")
+    axios.get(`${API_BASE}/api/quiz/questions`)
       .then(res => setQuestions(res.data))
       .catch(err => console.error("Error fetching questions:", err));
   }, []);
 
-  // Handle answer selection
-  const handleAnswer = (option) => {
-    setSelectedAnswer(option);
-  };
+  const handleAnswer = (option) => setSelectedAnswer(option);
 
-  // Submit answer and move to next question
   const handleNext = () => {
-    if (selectedAnswer === questions[currentQuestion].answer) {
-      setScore(score + 1);
-    }
+    if (selectedAnswer === questions[currentQuestion].answer) setScore(s => s + 1);
     if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
+      setCurrentQuestion(i => i + 1);
       setSelectedAnswer(null);
     } else {
       setQuizOver(true);
@@ -37,9 +32,7 @@ const QuizBot = () => {
 
   return (
     <div className="quizbot-container">
-      <button className="quiz-toggle" onClick={() => setIsOpen(!isOpen)}>
-        🧠
-      </button>
+      <button className="quiz-toggle" onClick={() => setIsOpen(!isOpen)}>🧠</button>
 
       {isOpen && (
         <div className="quiz-window">
