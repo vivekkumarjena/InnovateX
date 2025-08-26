@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios"; // <-- use the shared axios client
 import "./QuizBot.css";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 const QuizBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,17 +11,20 @@ const QuizBot = () => {
   const [quizOver, setQuizOver] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API_BASE}/api/quiz/questions`)
-      .then(res => setQuestions(res.data))
-      .catch(err => console.error("Error fetching questions:", err));
+    api
+      .get("/api/quiz/questions") // ✅ no hardcoded URL
+      .then((res) => setQuestions(res.data))
+      .catch((err) => console.error("Error fetching questions:", err));
   }, []);
 
   const handleAnswer = (option) => setSelectedAnswer(option);
 
   const handleNext = () => {
-    if (selectedAnswer === questions[currentQuestion].answer) setScore(s => s + 1);
+    if (selectedAnswer === questions[currentQuestion].answer) {
+      setScore((s) => s + 1);
+    }
     if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(i => i + 1);
+      setCurrentQuestion((i) => i + 1);
       setSelectedAnswer(null);
     } else {
       setQuizOver(true);
@@ -32,7 +33,9 @@ const QuizBot = () => {
 
   return (
     <div className="quizbot-container">
-      <button className="quiz-toggle" onClick={() => setIsOpen(!isOpen)}>🧠</button>
+      <button className="quiz-toggle" onClick={() => setIsOpen(!isOpen)}>
+        🧠
+      </button>
 
       {isOpen && (
         <div className="quiz-window">
@@ -44,7 +47,9 @@ const QuizBot = () => {
           {quizOver ? (
             <div className="quiz-body">
               <h3>Quiz Over!</h3>
-              <p>Your Score: {score} / {questions.length}</p>
+              <p>
+                Your Score: {score} / {questions.length}
+              </p>
             </div>
           ) : (
             <div className="quiz-body">
@@ -55,14 +60,20 @@ const QuizBot = () => {
                     {questions[currentQuestion].options.map((option, index) => (
                       <button
                         key={index}
-                        className={`option-btn ${selectedAnswer === option ? "selected" : ""}`}
+                        className={`option-btn ${
+                          selectedAnswer === option ? "selected" : ""
+                        }`}
                         onClick={() => handleAnswer(option)}
                       >
                         {option}
                       </button>
                     ))}
                   </div>
-                  <button className="next-btn" onClick={handleNext} disabled={!selectedAnswer}>
+                  <button
+                    className="next-btn"
+                    onClick={handleNext}
+                    disabled={!selectedAnswer}
+                  >
                     Next
                   </button>
                 </>

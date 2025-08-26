@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api/axios"; // <-- use the shared axios client
 import "./Chatbot.css";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
@@ -18,16 +16,21 @@ const Chatbot = () => {
     setInput("");
 
     try {
-      const res = await axios.post(`${API_BASE}/api/chat`, { userQuery: input });
+      const res = await api.post("/api/chat", { userQuery: input }); // ✅ no hardcoded URL
       setMessages([...newMessages, { text: res.data.response, sender: "bot" }]);
     } catch (error) {
-      setMessages([...newMessages, { text: "Error connecting to AI.", sender: "bot" }]);
+      setMessages([
+        ...newMessages,
+        { text: "Error connecting to AI.", sender: "bot" },
+      ]);
     }
   };
 
   return (
     <div className="chatbot-container">
-      <button className="chat-toggle" onClick={() => setIsOpen(!isOpen)}>💬</button>
+      <button className="chat-toggle" onClick={() => setIsOpen(!isOpen)}>
+        💬
+      </button>
       {isOpen && (
         <div className="chat-window">
           <div className="chat-header">
@@ -36,7 +39,9 @@ const Chatbot = () => {
           </div>
           <div className="chat-body">
             {messages.map((msg, index) => (
-              <div key={index} className={`chat-message ${msg.sender}`}>{msg.text}</div>
+              <div key={index} className={`chat-message ${msg.sender}`}>
+                {msg.text}
+              </div>
             ))}
           </div>
           <div className="chat-footer">
