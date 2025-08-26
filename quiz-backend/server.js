@@ -16,10 +16,12 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, cb) => {
-      // allow non-browser clients (no Origin) and allowed origins
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      cb(new Error("Not allowed by CORS"));
-    }
+  if (!origin) return cb(null, true); // allow non-browser clients
+  if (allowedOrigins.includes(origin)) return cb(null, true);
+  console.error("❌ CORS blocked origin:", origin); // log the actual origin
+  cb(new Error("Not allowed by CORS"));
+}
+
   })
 );
 
